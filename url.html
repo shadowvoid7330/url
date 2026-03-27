@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal URL Shortener</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 35px;
+            font-size: 1rem;
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 20px 25px 20px 70px;
+            border: 2px solid #e1e5e9;
+            border-radius: 18px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .link-icon {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            fill: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            border-radius: 18px;
+            padding: 30px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .short-url {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 22px;
+            word-break: break-all;
+            color: #166534;
+            margin: 18px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(34, 197, 94, 0.1);
+        }
+        
+        .short-url:hover {
+            color: #15803d;
+            background: rgba(34, 197, 94, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .copy-btn {
+            background: #22c55e;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            margin-top: 12px;
+        }
+        
+        .error {
+            background: #fef2f2 !important;
+            border-color: #ef4444 !important;
+        }
+        
+        @media (max-width: 480px) {
+            .container { 
+                padding: 40px 30px; 
+                margin: 10px;
+            }
+            .stats { 
+                flex-direction: column; 
+                gap: 10px; 
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🔗</div>
+        <h1>Universal URL Shortener</h1>
+        <p class="subtitle">Shorten GitHub, YouTube, Twitter, ANY URL instantly</p>
+        
+        <div class="input-group">
+            <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.25 4.072a9.75 9.75 0 0 1 1.95 4.537 9.75 9.75 0 0 1 2.547 3.32A.75.75 0 0 1 15 12H9a.75.75 0 0 1-.547-1.249 9.75 9.75 0 0 1 4.847-3.679z"/>
+                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-2.625 6a.75.75 0 0 1-.75-.75v-3.5a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-.75.75zm4.5 0a.75.75 0 0 1-.75-.75v-3.5a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-.75.75zM8.25 12a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75zM12 17.25a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1-.75-.75z"/>
+            </svg>
+            <input type="url" id="urlInput" placeholder="Paste any URL here..." />
+        </div>
+        
+        <button onclick="shortenUrl()">✨ Shorten URL</button>
+        
+        <div class="result" id="result">
+            <div>✅ Short URL created!</div>
+            <div class="short-url" id="shortUrl" onclick="copyToClipboard()"></div>
+            <div class="stats">
+                <div><strong>tinyurl.com</strong> • Free Forever</div>
+                <div>🔄 Redirects instantly</div>
+            </div>
+            <button class="copy-btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <script>
+        const TINYURL_API = 'https://tinyurl.com/api-create.php?url=';
+        const GITHUB_SHORTENER = 'https://gh.io/';
+
+        async function shortenUrl() {
+            const input = document.getElementById('urlInput');
+            const result = document.getElementById('result');
+            const shortUrlEl = document.getElementById('shortUrl');
+            const btn = document.querySelector('button');
+            
+            const url = input.value.trim();
+            
+            if (!url || !isValidUrl(url)) {
+                showError('Please enter a valid URL');
+                input.focus();
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Shortening...';
+            
+            try {
+                let shortUrl;
+                
+                // Special handling for GitHub URLs (faster, prettier)
+                if (isGitHubUrl(url)) {
+                    const repoMatch = url.match(/github\.com[/:]([^\/]+\/[^\/\s]+)(\.git)?/);
+                    if (repoMatch) {
+                        shortUrl = GITHUB_SHORTENER + repoMatch[1];
+                    }
+                } else {
+                    // TinyURL for everything else
+                    const response = await fetch(TINYURL_API + encodeURIComponent(url));
+                    shortUrl = await response.text();
+                }
+                
+                shortUrlEl.textContent = shortUrl;
+                result.style.display = 'block';
+                result.classList.remove('error');
+                input.blur();
+                
+            } catch (error) {
+                showError('Failed to shorten. Try again!');
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '✨ Shorten URL';
+            }
+        }
+        
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        function isGitHubUrl(url) {
+            return url.includes('github.com');
+        }
+        
+        function showError(message) {
+            const result = document.getElementById('result');
+            const shortUrlEl = document.getElementById('shortUrl');
+            result.classList.add('error');
+            shortUrlEl.textContent = message;
+            result.style.display = 'block';
+        }
+        
+        async function copyToClipboard() {
+            const shortUrl = document.getElementById('shortUrl').textContent;
+            try {
+                await navigator.clipboard.writeText(shortUrl);
+                const btn = document.querySelector('.copy-btn');
+                const original = btn.innerHTML;
+                btn.innerHTML = '✅ Copied!';
+                setTimeout(() => btn.innerHTML = original, 2000);
+            } catch (err) {
+                const textArea = document.createElement('textarea');
+                textArea.value = shortUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
+        }
+        
+        // Enter key support + auto-focus
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') shortenUrl();
+        });
+        
+        document.getElementById('urlInput').focus();
+    </script>
+</body>
+</html>
